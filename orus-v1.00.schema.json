@@ -1,0 +1,1530 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://redux.onl/schema/schema/orus-v1.00.schema.json",
+  "title": "Orus Bootstrap Spec v1.00",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "apiVersion",
+    "kind",
+    "metadata",
+    "deployment",
+    "networking",
+    "compute"
+  ],
+  "properties": {
+    "apiVersion": {
+      "type": "string",
+      "const": "orus/v1.00"
+    },
+    "kind": {
+      "type": "string",
+      "const": "Deployment"
+    },
+    "metadata": {
+      "$ref": "#/$defs/metadata"
+    },
+    "deployment": {
+      "$ref": "#/$defs/deployment"
+    },
+    "networking": {
+      "$ref": "#/$defs/networking"
+    },
+    "compute": {
+      "$ref": "#/$defs/compute"
+    },
+    "services": {
+      "$ref": "#/$defs/services"
+    }
+  },
+  "$defs": {
+    "id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "metadata": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "name"
+      ],
+      "properties": {
+        "title": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "name": {
+          "$ref": "#/$defs/id"
+        },
+        "owner": {
+          "type": "string"
+        },
+        "version": {
+          "type": "string"
+        }
+      }
+    },
+    "deployment": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "providers"
+      ],
+      "properties": {
+        "defaults": {
+          "$ref": "#/$defs/targetDefaults"
+        },
+        "providers": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/$defs/deploymentProvider"
+          }
+        }
+      }
+    },
+    "deploymentProvider": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "provider",
+        "region"
+      ],
+      "properties": {
+        "enabled": {
+          "type": "boolean"
+        },
+        "name": {
+          "$ref": "#/$defs/id"
+        },
+        "provider": {
+          "type": "string",
+          "enum": [
+            "azure",
+            "aws",
+            "gcp"
+          ]
+        },
+        "region": {
+          "type": "string"
+        },
+        "placement": {
+          "$ref": "#/$defs/placement"
+        },
+        "identity": {
+          "$ref": "#/$defs/providerIdentity"
+        },
+        "account": {
+          "$ref": "#/$defs/providerAccountContext"
+        },
+        "dns": {
+          "$ref": "#/$defs/providerDnsContext"
+        },
+        "repositories": {
+          "$ref": "#/$defs/providerRepositories"
+        },
+        "overrides": {
+          "type": "object",
+          "additionalProperties": true
+        }
+      }
+    },
+    "providerIdentity": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "managedIdentity": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "instanceProfile": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "serviceAccount": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      }
+    },
+    "providerAccountContext": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "subscriptionId": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "accountId": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "projectId": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      }
+    },
+    "providerDnsContext": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "zone": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "resourceGroup": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "hostedZoneId": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "managedZone": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "privateZone": {
+          "type": "boolean"
+        },
+        "hostnameMode": {
+          "type": "string",
+          "enum": [
+            "authored",
+            "dottedIp",
+            "randomGuid"
+          ]
+        },
+        "account": {
+          "$ref": "#/$defs/providerAccountContext"
+        },
+        "overrides": {
+          "type": "object",
+          "additionalProperties": true
+        }
+      }
+    },
+    "providerRepositories": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "snapshots": {
+          "$ref": "#/$defs/providerRepositoryGroup"
+        },
+        "images": {
+          "$ref": "#/$defs/providerRepositoryGroup"
+        }
+      }
+    },
+    "providerRepositoryGroup": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "source": {
+          "$ref": "#/$defs/providerRepositoryLocation"
+        },
+        "capture": {
+          "$ref": "#/$defs/providerRepositoryLocation"
+        },
+        "publishTargets": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/providerRepositoryLocation"
+          }
+        }
+      }
+    },
+    "providerRepositoryLocation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "repository"
+      ],
+      "properties": {
+        "region": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "repository": {
+          "type": "string"
+        },
+        "account": {
+          "$ref": "#/$defs/providerAccountContext"
+        },
+        "replication": {
+          "$ref": "#/$defs/providerRepositoryReplication"
+        },
+        "overrides": {
+          "type": "object",
+          "additionalProperties": true
+        }
+      }
+    },
+    "providerRepositoryReplication": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "mode": {
+          "type": "string",
+          "enum": [
+            "managed-copy",
+            "sas-export"
+          ]
+        },
+        "container": {
+          "type": "string"
+        },
+        "temporaryStorageAccount": {
+          "type": "string"
+        },
+        "sasDurationSeconds": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "deleteTempStorageAccount": {
+          "type": "boolean"
+        },
+        "deleteTempDisks": {
+          "type": "boolean"
+        },
+        "storageSku": {
+          "type": "string"
+        },
+        "storageKind": {
+          "type": "string"
+        }
+      }
+    },
+    "targetDefaults": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "networkPolicy": {
+          "type": "string"
+        },
+        "devMode": {
+          "type": "boolean"
+        }
+      }
+    },
+    "networking": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "networks"
+      ],
+      "properties": {
+        "policies": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/networkPolicy"
+          }
+        },
+        "networks": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/$defs/network"
+          }
+        }
+      }
+    },
+    "network": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "name",
+        "addressSpaces",
+        "segments"
+      ],
+      "properties": {
+        "name": {
+          "$ref": "#/$defs/id"
+        },
+        "placement": {
+          "$ref": "#/$defs/placement"
+        },
+        "addressSpaces": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string"
+          }
+        },
+        "segments": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/$defs/segment"
+          }
+        },
+        "downstreamRoutes": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/route"
+          }
+        }
+      }
+    },
+    "networkPolicy": {
+      "oneOf": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "name",
+            "mode",
+            "appliesTo",
+            "rules"
+          ],
+          "properties": {
+            "name": {
+              "$ref": "#/$defs/id"
+            },
+            "description": {
+              "type": "string"
+            },
+            "mode": {
+              "type": "string",
+              "const": "allowlist"
+            },
+            "appliesTo": {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "$ref": "#/$defs/networkPolicyTarget"
+              }
+            },
+            "rules": {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "$ref": "#/$defs/allowlistPolicyRule"
+              }
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "name",
+            "mode",
+            "appliesTo",
+            "rules"
+          ],
+          "properties": {
+            "name": {
+              "$ref": "#/$defs/id"
+            },
+            "description": {
+              "type": "string"
+            },
+            "mode": {
+              "type": "string",
+              "const": "firewall"
+            },
+            "appliesTo": {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "$ref": "#/$defs/networkPolicyTarget"
+              }
+            },
+            "rules": {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "$ref": "#/$defs/networkPolicyRule"
+              }
+            }
+          }
+        }
+      ]
+    },
+    "allowlistPolicyRule": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "name",
+        "direction",
+        "action",
+        "protocol",
+        "from",
+        "to"
+      ],
+      "properties": {
+        "name": {
+          "$ref": "#/$defs/id"
+        },
+        "description": {
+          "type": "string"
+        },
+        "priority": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "direction": {
+          "type": "string",
+          "enum": [
+            "ingress",
+            "egress"
+          ]
+        },
+        "action": {
+          "type": "string",
+          "const": "allow"
+        },
+        "protocol": {
+          "type": "string",
+          "enum": [
+            "any",
+            "tcp",
+            "udp",
+            "icmp"
+          ]
+        },
+        "ports": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "from": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/$defs/networkEndpoint"
+          }
+        },
+        "to": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/$defs/networkEndpoint"
+          }
+        }
+      }
+    },
+    "networkPolicyRule": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "name",
+        "direction",
+        "action",
+        "protocol",
+        "from",
+        "to"
+      ],
+      "properties": {
+        "name": {
+          "$ref": "#/$defs/id"
+        },
+        "description": {
+          "type": "string"
+        },
+        "priority": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "direction": {
+          "type": "string",
+          "enum": [
+            "ingress",
+            "egress"
+          ]
+        },
+        "action": {
+          "type": "string",
+          "enum": [
+            "allow",
+            "deny"
+          ]
+        },
+        "protocol": {
+          "type": "string",
+          "enum": [
+            "any",
+            "tcp",
+            "udp",
+            "icmp"
+          ]
+        },
+        "ports": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "from": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/$defs/networkEndpoint"
+          }
+        },
+        "to": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/$defs/networkEndpoint"
+          }
+        }
+      }
+    },
+    "networkPolicyTarget": {
+      "oneOf": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "type"
+          ],
+          "properties": {
+            "type": {
+              "type": "string",
+              "const": "deployment"
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "type",
+            "name"
+          ],
+          "properties": {
+            "type": {
+              "type": "string",
+              "const": "network"
+            },
+            "name": {
+              "type": "string"
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "type",
+            "name"
+          ],
+          "properties": {
+            "type": {
+              "type": "string",
+              "const": "segment"
+            },
+            "name": {
+              "type": "string"
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "type",
+            "name"
+          ],
+          "properties": {
+            "type": {
+              "type": "string",
+              "const": "instance"
+            },
+            "name": {
+              "type": "string"
+            }
+          }
+        }
+      ]
+    },
+    "networkEndpoint": {
+      "oneOf": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "type"
+          ],
+          "properties": {
+            "type": {
+              "type": "string",
+              "const": "any"
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "type",
+            "cidr"
+          ],
+          "properties": {
+            "type": {
+              "type": "string",
+              "const": "cidr"
+            },
+            "cidr": {
+              "type": "string"
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "type",
+            "selector"
+          ],
+          "properties": {
+            "type": {
+              "type": "string",
+              "const": "selector"
+            },
+            "selector": {
+              "type": "string",
+              "enum": [
+                "deploymentPublicIps",
+                "publicNodePrivateIps"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    "segment": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "name",
+        "cidr"
+      ],
+      "properties": {
+        "name": {
+          "$ref": "#/$defs/id"
+        },
+        "placement": {
+          "$ref": "#/$defs/placement"
+        },
+        "cidr": {
+          "type": "string"
+        },
+        "router": {
+          "$ref": "#/$defs/router"
+        }
+      }
+    },
+    "router": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "mode"
+      ],
+      "properties": {
+        "mode": {
+          "type": "string",
+          "enum": [
+            "primary",
+            "secondary",
+            "direct",
+            "redirect",
+            "bypass"
+          ]
+        },
+        "address": {
+          "type": "string"
+        },
+        "primarySegment": {
+          "type": "string"
+        },
+        "alternate": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "name": {
+              "type": "string"
+            },
+            "cidr": {
+              "type": "string"
+            },
+            "address": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    },
+    "route": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "name",
+        "cidr"
+      ],
+      "properties": {
+        "name": {
+          "$ref": "#/$defs/id"
+        },
+        "cidr": {
+          "type": "string"
+        },
+        "type": {
+          "type": "string"
+        }
+      }
+    },
+    "compute": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "instances"
+      ],
+      "properties": {
+        "instances": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/$defs/instance"
+          }
+        }
+      }
+    },
+    "instance": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "name",
+        "size",
+        "os",
+        "network",
+        "nics",
+        "disks"
+      ],
+      "properties": {
+        "name": {
+          "$ref": "#/$defs/id"
+        },
+        "placement": {
+          "$ref": "#/$defs/placement"
+        },
+        "size": {
+          "$ref": "#/$defs/boundString"
+        },
+        "fallbackSize": {
+          "$ref": "#/$defs/boundString"
+        },
+        "os": {
+          "type": "string",
+          "enum": [
+            "linux",
+            "windows"
+          ]
+        },
+        "network": {
+          "type": "string"
+        },
+        "critical": {
+          "type": "boolean"
+        },
+        "autoConfig": {
+          "type": "boolean"
+        },
+        "nics": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/$defs/nic"
+          }
+        },
+        "disks": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/$defs/disk"
+          }
+        },
+        "remoteAccess": {
+          "$ref": "#/$defs/instanceRemoteAccess"
+        },
+        "bootstrap": {
+          "type": "object",
+          "additionalProperties": true
+        }
+      }
+    },
+    "boundString": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "default",
+        "providers"
+      ],
+      "properties": {
+        "default": {
+          "type": "string"
+        },
+        "providers": {
+          "$ref": "#/$defs/providerValue"
+        }
+      }
+    },
+    "placement": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "scope"
+      ],
+      "properties": {
+        "scope": {
+          "type": "string",
+          "enum": [
+            "regional",
+            "zonal"
+          ]
+        },
+        "region": {
+          "type": "string"
+        },
+        "zones": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "nic": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "segment",
+        "addressing"
+      ],
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "index": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "segment": {
+          "type": "string"
+        },
+        "addressing": {
+          "$ref": "#/$defs/addressing"
+        },
+        "publicAccess": {
+          "$ref": "#/$defs/publicAccess"
+        },
+        "registerDns": {
+          "type": "boolean"
+        },
+        "dnsServers": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "forwarding": {
+          "type": "boolean"
+        },
+        "acceleratedNetworking": {
+          "type": "boolean"
+        },
+        "secondaryAddresses": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/secondaryAddress"
+          }
+        }
+      }
+    },
+    "publicAccess": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "mode"
+      ],
+      "properties": {
+        "mode": {
+          "type": "string",
+          "enum": [
+            "ephemeral",
+            "reserved"
+          ]
+        },
+        "version": {
+          "type": "string",
+          "enum": [
+            "ipv4",
+            "ipv6",
+            "dualstack"
+          ]
+        },
+        "addressRef": {
+          "$ref": "#/$defs/boundString"
+        }
+      }
+    },
+    "addressing": {
+      "oneOf": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "mode",
+            "address"
+          ],
+          "properties": {
+            "mode": {
+              "type": "string",
+              "const": "static"
+            },
+            "address": {
+              "type": "string"
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "mode",
+            "prefix"
+          ],
+          "properties": {
+            "mode": {
+              "type": "string",
+              "const": "dynamic"
+            },
+            "prefix": {
+              "type": "string"
+            }
+          }
+        }
+      ]
+    },
+    "secondaryAddress": {
+      "oneOf": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "mode",
+            "address"
+          ],
+          "properties": {
+            "mode": {
+              "type": "string",
+              "const": "static"
+            },
+            "address": {
+              "type": "string"
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "mode",
+            "prefix"
+          ],
+          "properties": {
+            "mode": {
+              "type": "string",
+              "const": "dynamic"
+            },
+            "prefix": {
+              "type": "string"
+            }
+          }
+        }
+      ]
+    },
+    "disk": {
+      "oneOf": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "sourceType",
+            "sourceRef",
+            "sizeGb",
+            "storageClass"
+          ],
+          "properties": {
+            "sourceType": {
+              "type": "string",
+              "enum": [
+                "snapshot",
+                "image",
+                "disk"
+              ]
+            },
+            "sourceRef": {
+              "$ref": "#/$defs/boundString"
+            },
+            "sizeGb": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "storageClass": {
+              "$ref": "#/$defs/boundString"
+            },
+            "imageGeneration": {
+              "$ref": "#/$defs/boundString"
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "sourceType",
+            "marketplace",
+            "sizeGb",
+            "storageClass"
+          ],
+          "properties": {
+            "sourceType": {
+              "type": "string",
+              "const": "marketplace"
+            },
+            "sourceRef": {
+              "$ref": "#/$defs/boundString"
+            },
+            "marketplace": {
+              "$ref": "#/$defs/marketplaceImage"
+            },
+            "sizeGb": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "storageClass": {
+              "$ref": "#/$defs/boundString"
+            },
+            "imageGeneration": {
+              "$ref": "#/$defs/boundString"
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "sourceType",
+            "sizeGb",
+            "storageClass"
+          ],
+          "properties": {
+            "sourceType": {
+              "type": "string",
+              "const": "blank"
+            },
+            "sizeGb": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "storageClass": {
+              "$ref": "#/$defs/boundString"
+            },
+            "imageGeneration": {
+              "$ref": "#/$defs/boundString"
+            }
+          }
+        }
+      ]
+    },
+    "marketplaceImage": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "publisher",
+        "offer",
+        "sku"
+      ],
+      "properties": {
+        "publisher": {
+          "$ref": "#/$defs/boundString"
+        },
+        "offer": {
+          "$ref": "#/$defs/boundString"
+        },
+        "sku": {
+          "$ref": "#/$defs/boundString"
+        },
+        "version": {
+          "$ref": "#/$defs/boundString"
+        },
+        "plan": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "name": {
+              "$ref": "#/$defs/boundString"
+            },
+            "publisher": {
+              "$ref": "#/$defs/boundString"
+            },
+            "product": {
+              "$ref": "#/$defs/boundString"
+            }
+          }
+        }
+      }
+    },
+    "providerValue": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "azure",
+        "aws",
+        "gcp"
+      ],
+      "properties": {
+        "azure": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "aws": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "gcp": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      }
+    },
+    "vnic": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "name",
+        "address"
+      ],
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "address": {
+          "type": "string"
+        },
+        "segment": {
+          "type": "string"
+        },
+        "attachTo": {
+          "type": "string"
+        }
+      }
+    },
+    "vxlan": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "edgeId",
+        "vni",
+        "name",
+        "interface",
+        "peerNodeId",
+        "peerInterfaceId",
+        "remoteSource",
+        "remoteDest"
+      ],
+      "properties": {
+        "edgeId": {
+          "type": "string"
+        },
+        "vni": {
+          "type": "integer"
+        },
+        "name": {
+          "type": "string"
+        },
+        "mirror": {
+          "type": "boolean"
+        },
+        "interface": {
+          "type": "string"
+        },
+        "peerNodeId": {
+          "type": "string"
+        },
+        "peerInterfaceId": {
+          "type": "string"
+        },
+        "remoteSource": {
+          "type": "string"
+        },
+        "remoteDest": {
+          "type": "string"
+        }
+      }
+    },
+    "services": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "dns": {
+          "$ref": "#/$defs/dnsService"
+        },
+        "remoteAccess": {
+          "$ref": "#/$defs/remoteAccessService"
+        }
+      }
+    },
+    "dnsService": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "enabled": {
+          "type": "boolean"
+        },
+        "zone": {
+          "type": "string"
+        },
+        "backend": {
+          "$ref": "#/$defs/dnsServiceBackend"
+        }
+      }
+    },
+    "dnsServiceBackend": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "type"
+      ],
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": [
+            "porkbun"
+          ]
+        },
+        "apiEndpoint": {
+          "type": "string"
+        },
+        "verifyTls": {
+          "type": "boolean"
+        },
+        "hostnameMode": {
+          "type": "string",
+          "enum": [
+            "authored",
+            "dottedIp",
+            "randomGuid"
+          ]
+        },
+        "apiKeySecretRef": {
+          "type": "string"
+        },
+        "secretApiKeySecretRef": {
+          "type": "string"
+        },
+        "ttl": {
+          "type": "integer",
+          "minimum": 600
+        },
+        "notes": {
+          "type": "string"
+        }
+      }
+    },
+    "remoteAccessService": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "enabled": {
+          "type": "boolean"
+        },
+        "routerRef": {
+          "type": "string"
+        },
+        "type": {
+          "type": "string"
+        },
+        "certificateSync": {
+          "$ref": "#/$defs/remoteAccessCertificateSync"
+        },
+        "backend": {
+          "$ref": "#/$defs/remoteAccessBackend"
+        }
+      }
+    },
+    "remoteAccessCertificateSync": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "certFile": {
+          "type": "string"
+        },
+        "privkeyFile": {
+          "type": "string"
+        }
+      }
+    },
+    "remoteAccessBackend": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "endpoint": {
+          "type": "string"
+        },
+        "verifyTls": {
+          "type": "boolean"
+        },
+        "dataSource": {
+          "type": "string"
+        },
+        "usernameSecretRef": {
+          "type": "string"
+        },
+        "passwordSecretRef": {
+          "type": "string"
+        },
+        "guacdHost": {
+          "type": "string"
+        },
+        "guacdPort": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 65535
+        },
+        "connectionGroup": {
+          "type": "string"
+        },
+        "gatewayGroup": {
+          "type": "string"
+        },
+        "labels": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "instanceRemoteAccess": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "enabled": {
+          "type": "boolean"
+        },
+        "protocol": {
+          "type": "string",
+          "enum": [
+            "ssh",
+            "rdp",
+            "vnc",
+            "http"
+          ]
+        },
+        "port": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 65535
+        },
+        "connectionName": {
+          "type": "string"
+        },
+        "usernameSecretRef": {
+          "type": "string"
+        },
+        "passwordSecretRef": {
+          "type": "string"
+        },
+        "privateKeySecretRef": {
+          "type": "string"
+        },
+        "groupAccount": {
+          "$ref": "#/$defs/remoteAccessAccount"
+        },
+        "userAccount": {
+          "$ref": "#/$defs/remoteAccessAccount"
+        },
+        "permissions": {
+          "$ref": "#/$defs/remoteAccessPermissions"
+        }
+      }
+    },
+    "remoteAccessAccount": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "passwordSecretRef": {
+          "type": "string"
+        }
+      }
+    },
+    "remoteAccessPermissions": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "connection": {
+          "$ref": "#/$defs/remoteAccessPermissionList"
+        },
+        "connectionGroup": {
+          "$ref": "#/$defs/remoteAccessPermissionList"
+        },
+        "sharingProfiles": {
+          "$ref": "#/$defs/remoteAccessPermissionList"
+        }
+      }
+    },
+    "remoteAccessPermissionList": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "enum": [
+          "READ",
+          "UPDATE",
+          "DELETE",
+          "ADMINISTER"
+        ]
+      },
+      "uniqueItems": true
+    }
+  }
+}
